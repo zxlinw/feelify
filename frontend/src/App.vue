@@ -1,27 +1,26 @@
 <template>
-  <div id="app" class="max-w-md mx-auto mt-16 text-center font-sans p-4">
-    <h1 class="text-3xl font-bold mb-6 text-blue-600">Feelify 🎵</h1>
+  <div id="app">
+    <!-- Title Row -->
+    <header>
+      <h1>Feelify 🎵</h1>
+    </header>
 
-    <form @submit.prevent="fetchPlaylist" class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
-      <input
-        v-model="emotion"
-        placeholder="How are you feeling?"
-        class="w-full sm:w-2/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <button
-        type="submit"
-        class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition"
-      >
-        Get Playlist
-      </button>
-    </form>
+    <!-- Form Row -->
+    <section class="input-section">
+      <form @submit.prevent="fetchPlaylist">
+        <input v-model="emotion" placeholder="How are you feeling?" />
+        <button type="submit">Get Playlist</button>
+      </form>
+    </section>
 
-    <div v-if="playlistUrl" class="mb-4">
-      <p class="font-semibold text-gray-700 mb-1">Spotify Playlist:</p>
-      <a :href="playlistUrl" target="_blank" class="text-blue-500 underline break-all">{{ playlistUrl }}</a>
-    </div>
-
-    <p v-if="error" class="text-red-500 font-medium">{{ error }}</p>
+    <!-- Result Row -->
+    <section class="result-section">
+      <div v-if="playlistUrl">
+        <p><strong>Spotify Playlist:</strong></p>
+        <a :href="playlistUrl" target="_blank">{{ playlistUrl }}</a>
+      </div>
+      <p v-else-if="error" class="error">{{ error }}</p>
+    </section>
   </div>
 </template>
 
@@ -37,6 +36,7 @@ export default {
     const fetchPlaylist = async () => {
       try {
         error.value = ''
+        playlistUrl.value = ''
         const res = await fetch(`http://127.0.0.1:8000/api/get-playlist/?emotion=${emotion.value}`)
         const data = await res.json()
 
@@ -47,6 +47,7 @@ export default {
         }
       } catch (err) {
         error.value = 'Error fetching playlist.'
+        playlistUrl.value = ''
         console.error(err)
       }
     }
@@ -62,5 +63,83 @@ export default {
 </script>
 
 <style>
-/* No custom styles needed since Tailwind CSS handles everything */
+/* Reset and base styling */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: #1e1e2f;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Main container layout */
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  padding: 2rem;
+  justify-content: center;
+  position: relative;
+}
+
+/* Title styling */
+header h1 {
+  color: #4ea8de;
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Form section */
+.input-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+form {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+}
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  flex: 1;
+  font-size: 1rem;
+}
+button {
+  padding: 10px 16px;
+  background-color: #4ea8de;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+button:hover {
+  background-color: #3a88b8;
+}
+
+/* Result section always takes up space to avoid layout shift */
+.result-section {
+  text-align: center;
+  margin-top: 2rem;
+  min-height: 3rem;
+}
+.result-section a {
+  color: #93c5fd;
+  word-break: break-word;
+}
+.error {
+  color: #ff6b6b;
+  font-weight: bold;
+}
 </style>
